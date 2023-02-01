@@ -166,15 +166,20 @@ def predict(model, features, training_data, validation_data, live_data):
     model_to_submit = f"preds_{model_name}_neutral_riskiest_50"
 
     # rename best model to "prediction" and rank from 0 to 1 to meet upload requirements
-    # validation_data["predic?tion"] = validation_data[model_to_submit].rank(pct=True)
-    predictions = live_data[model_to_submit].rank(pct=True)
+    # validation_data["prediction"] = validation_data[model_to_submit].rank(pct=True)
+    live_data["prediction"] = live_data[model_to_submit].rank(pct=True)
 
-    return predictions
+    return live_data
 
-def submit(predictions):
+def submit(live_data):
     predict_output_path = f"live_predictions_{current_round}.csv"
 
-    predictions.to_csv(predict_output_path)
+    #make new dataframe with only the index (contains ids)
+    predictions_df = live_data.index.to_frame()
+    #copy predictions into new dataframe
+    predictions_df["prediction"] = live_data["prediction"].copy()
+
+    predictions_df.to_csv(predict_output_path, index=False)
     # validation_data["prediction"].to_csv(f"validation_predictions_{current_round}.csv")
 
     # Numerai API uses Environment variables to find your keys:
@@ -183,6 +188,9 @@ def submit(predictions):
     logging.info('submitting')
     napi.upload_predictions(predict_output_path, model_id=MODEL_ID)
 
+    # "garbage collection" (gc) gets rid of unused data and frees up memory
+    gc.collect()
+
     return
 
 
@@ -190,15 +198,25 @@ def main():
     """ Download, train, predict and submit for this model """
 
     features, training_data, validation_data, live_data = download_data()
+    # "garbage collection" (gc) gets rid of unused data and frees up memory
+    gc.collect()
     model = train(training_data)
-    predictions = predict(
+    # "garbage collection" (gc) gets rid of unused data and frees up memory
+    gc.collect()
+    new_live_data = predict(
         model,
         features,
         training_data,
         validation_data,
         live_data
     )
-    submit(predictions)
+    # "garbage collection" (gc) gets rid of unused data and frees up memory
+    gc.collect()
+
+    submit(new_live_data)
+
+    # "garbage collection" (gc) gets rid of unused data and frees up memory
+    gc.collect()
 
 if __name__ == '__main__':
     main()
