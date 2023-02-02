@@ -22,5 +22,5 @@ model.fit(
    training_data['target']
 )
 
-model_id = 'your-model-id'
+model_id = 'dcbce83a-956a-43a1-9961-0fb9c5828ac9'
 napi.deploy(model_id, model, napi.feature_sets('small'), 'requirements.txt')
