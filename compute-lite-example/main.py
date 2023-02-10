@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import joblib
 from numerapi import NumerAPI
 from lightgbm import LGBMRegressor
 
@@ -22,5 +23,7 @@ model.fit(
    training_data['target']
 )
 
+joblib.dump(model, 'my_example_file_to_dump')
+
 model_id = 'dcbce83a-956a-43a1-9961-0fb9c5828ac9'
-napi.deploy(model_id, model, napi.feature_sets('small'), 'requirements.txt')
+# napi.deploy(model_id, model, napi.feature_sets('small'), 'requirements.txt')

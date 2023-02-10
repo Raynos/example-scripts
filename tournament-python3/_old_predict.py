@@ -18,6 +18,7 @@ MODEL = LinearRegression()
 napi = numerapi.NumerAPI()
 
 
+
 def download_data():
     """ Download the data files """
 
